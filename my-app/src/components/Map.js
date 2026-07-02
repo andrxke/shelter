@@ -5,7 +5,10 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 import * as turf from '@turf/turf';
 
-function Map({data}){
+// Cache to prevent redundant geocoding requests across re-renders
+const geocodeCache = new Map();
+
+function ShelterMap({data}){
     const mapContainer = useRef(null);
     const map = useRef(null);
     const [lng, setLng] = useState(-79.34);
@@ -32,7 +35,9 @@ function Map({data}){
         if (map.current){
           map.current.remove();
         }
-        mapboxgl.accessToken = process.env.REACT_APP_MAPBOX;
+        if (process.env.REACT_APP_MAPBOX) {
+            mapboxgl.accessToken = process.env.REACT_APP_MAPBOX;
+        }
         map.current = new mapboxgl.Map({
           container: mapContainer.current,
           style: 'mapbox://styles/mapbox/streets-v12',
@@ -75,6 +80,7 @@ function Map({data}){
           setLat(map.current.getCenter().lat.toFixed(4));
           setZoom(map.current.getZoom().toFixed(2));
         });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data]);
     
     useEffect(() => {
@@ -82,35 +88,67 @@ function Map({data}){
       const addMarkers = async () => {
         if (data && data.length > 0) {
             const localMarkers = [];
+            const uniqueAddresses = new Set();
+            const addressToShelters = new Map();
+
+            // Group shelters by address
             for (const entry of data) {
                 if (entry.data) {
                     for (const org of entry.data) {
-                        try {
-                            const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(org.address)}.json?access_token=${mapboxgl.accessToken}`);
-                            const geocodingData = await response.json();
-                            const coordinates = geocodingData.features[0].center;
-                            const marker = new mapboxgl.Marker()
-                              .setLngLat(coordinates)
-                              .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(`<h3>${org.name}</h3><p>${org.address}</p>`))
-                              .addTo(map.current);
-                            localMarkers.push({
-                                coordinates: coordinates,
-                                marker: marker
-                            });
-                            //markers.push(coordinates);
-                        } catch (error) {
-                            console.error('Error geocoding address:', org, error);
+                        if (!org.address) continue;
+                        uniqueAddresses.add(org.address);
+                        if (!addressToShelters.has(org.address)) {
+                            addressToShelters.set(org.address, []);
                         }
+                        addressToShelters.get(org.address).push(org);
                     }
                 }
             }
+
+            // Identify addresses that need geocoding
+            const uncachedAddresses = Array.from(uniqueAddresses).filter(addr => !geocodeCache.has(addr));
+            
+            // Geocode uncached addresses concurrently (with a basic concurrency limit if needed, but Promise.all is fine for ~200)
+            if (uncachedAddresses.length > 0) {
+                await Promise.all(uncachedAddresses.map(async (address) => {
+                    try {
+                        const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${mapboxgl.accessToken}`);
+                        const geocodingData = await response.json();
+                        if (geocodingData.features && geocodingData.features.length > 0) {
+                            geocodeCache.set(address, geocodingData.features[0].center);
+                        }
+                    } catch (error) {
+                        console.error('Error geocoding address:', address, error);
+                    }
+                }));
+            }
+
+            // Create markers
+            for (const address of uniqueAddresses) {
+                const coordinates = geocodeCache.get(address);
+                if (coordinates) {
+                    const shelters = addressToShelters.get(address) || [];
+                    // Create a composite HTML string if multiple shelters are at the same address
+                    const popupHtml = shelters.map(org => `<h3>${org.name}</h3><p>${org.address}</p>`).join('<hr/>');
+                    
+                    const marker = new mapboxgl.Marker()
+                      .setLngLat(coordinates)
+                      .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupHtml))
+                      .addTo(map.current);
+                      
+                    localMarkers.push({
+                        coordinates: coordinates,
+                        marker: marker
+                    });
+                }
+            }
+            
             setMarkers(localMarkers);
             setLoadingMarkers(false);
+        } else {
+          console.log("error loading markers or no data");
         }
-        else {
-          console.log("error loading markers")
-        }
-    };
+      };
       addMarkers();
     }, [data]);
     return(
@@ -122,4 +160,4 @@ function Map({data}){
         </div>
     );
 }
-export default Map
+export default ShelterMap

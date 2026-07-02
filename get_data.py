@@ -30,7 +30,16 @@ data_to_insert = {
 for resource in package["result"]["resources"]:
     if resource["datastore_active"]:
         url = base_url + "/api/3/action/datastore_search"
-        p = {"id": resource["id"]}
+        
+        # Step 1: Get the maximum (latest) occupancy date
+        p_max = {"id": resource["id"], "sort": "OCCUPANCY_DATE desc", "limit": 1}
+        max_res = requests.get(url, params=p_max).json().get("result", {})
+        if not max_res.get("records"):
+            continue
+        max_date = max_res["records"][0]["OCCUPANCY_DATE"]
+        
+        # Step 2: Fetch all records for the latest date
+        p = {"id": resource["id"], "filters": f'{{"OCCUPANCY_DATE": "{max_date}"}}', "limit": 32000}
         resource_search_data = requests.get(url, params=p).json()["result"]
         
         resource_data = [

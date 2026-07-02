@@ -1,74 +1,159 @@
 .App {
   text-align: center;
-}
-
-.App-header {
-  background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+h1 {
+  font-weight: 700;
+  font-size: 3rem;
+  margin: 2rem 0;
+  background: linear-gradient(135deg, #60A5FA, #3B82F6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.App-header {
+  padding: 2rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  width: 100vw;
-  grid-gap: 1rem;
+  /* Responsive grid layout */
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  width: 100%;
+  max-width: 1200px;
+  grid-gap: 1.5rem;
+  margin-top: 2rem;
 }
 
-.card{
-  background-color: white;
-  color: #282c34;
-  border-radius: 5px;
+.card {
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  color: var(--text-primary);
   cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  text-align: left;
+}
+
+.card:hover, .card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent-color);
+  outline: none;
+}
+
+.card h2 {
+  margin-top: 0;
+  font-size: 1.25rem;
+  color: var(--accent-color);
+}
+
+.card h3 {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin: 0.5rem 0;
+}
+
+.card p {
+  margin-bottom: 0;
+  font-weight: 600;
+}
+
+/* Modal overlay to darken background */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(4px);
+  z-index: 9998;
 }
 
 .expanded-card {
   position: fixed;
   top: 50%;
   left: 50%;
-  height: 30vh;
-  overflow: scroll;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
   transform: translate(-50%, -50%);
-  background-color: white;
-  padding: 20px;
-  border: 1px solid #ccc;
-  color: black;
-  border-radius: 5px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-  z-index: 9999; /* Ensure it appears on top of everything */
+  background: var(--bg-secondary);
+  padding: 2rem;
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  text-align: left;
+}
+
+.expanded-card h2 {
+  margin-top: 0;
+  color: var(--accent-color);
+}
+
+.expanded-card p {
+  color: var(--text-secondary);
+  line-height: 1.6;
 }
 
 .map-container {
   height: 400px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
 }
+
 .sidebar {
-  background-color: rgb(35 55 75 / 90%);
-  color: #fff;
-  padding: 6px 12px;
-  font-family: monospace;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 8px 16px;
+  font-family: 'Inter', monospace;
+  font-size: 0.875rem;
   z-index: 1;
   position: absolute;
   top: 0;
   left: 0;
-  margin: 12px;
-  border-radius: 4px;
-}
-.marker {
-  background-image: url('icon.png');
-  background-size: cover;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  cursor: pointer;
+  margin: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
 }
 
+/* Map popup override for dark mode */
+.mapboxgl-popup-content {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 8px !important;
+}
 
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
+  border-top-color: var(--bg-secondary) !important;
+}
+
+/* Remove default ul styling */
+ul {
+  list-style-type: none;
+  padding: 0;
+  width: 100%;
+}

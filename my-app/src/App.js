@@ -6,7 +6,7 @@ import Map from './components/Map'
 // Map Imports
 import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 
-mapboxgl.accessToken = 'pk.eyJ1Ijoibm9oeXBlIiwiYSI6ImNsdjBlZXl5YjFpczkycW84NDl1Znl4YzEifQ.wGi61OuX6Ya5Q2HvYx_BDQ';
+mapboxgl.accessToken = process.env.REACT_APP_MAPBOX;
 
 function App() {
   const [data, setData] = useState([])
