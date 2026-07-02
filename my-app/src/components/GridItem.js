@@ -1,4 +1,8 @@
 import React from 'react';
+import BusinessIcon from '@mui/icons-material/Business';
+import CategoryIcon from '@mui/icons-material/Category';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import BedIcon from '@mui/icons-material/Bed';
 
 const GridItem = ({ name, sector, orgName, address, unoccupiedBeds, onClick }) => {
   const handleKeyDown = (e) => {
@@ -23,11 +27,11 @@ const GridItem = ({ name, sector, orgName, address, unoccupiedBeds, onClick }) =
       aria-label={`Shelter: ${name}, ${sector} sector. ${unoccupiedBeds} beds available.`}
     >
       <h2>{name}</h2>
-      <h3>{sector}</h3>
-      <h3>{orgName}</h3>
-      <p>{address}</p>
-      <p style={{ color: getBedColor(unoccupiedBeds), marginTop: '0.5rem' }}>
-        Beds: {unoccupiedBeds === "" ? "No Data" : unoccupiedBeds}
+      <h3 style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}><CategoryIcon fontSize="small"/> {sector}</h3>
+      <h3 style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}><BusinessIcon fontSize="small"/> {orgName}</h3>
+      <p style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}><LocationOnIcon fontSize="small"/> {address}</p>
+      <p style={{ color: getBedColor(unoccupiedBeds), marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <BedIcon fontSize="small"/> Beds: {unoccupiedBeds === "" ? "No Data" : unoccupiedBeds}
       </p>
     </div>
   );

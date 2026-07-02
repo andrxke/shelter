@@ -9,7 +9,7 @@ h1 {
   font-weight: 700;
   font-size: 3rem;
   margin: 2rem 0;
-  background: linear-gradient(135deg, #60A5FA, #3B82F6);
+  background: linear-gradient(135deg, var(--accent-hover), var(--accent-color));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -78,7 +78,7 @@ h1 {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(39, 39, 39, 0.8);
   backdrop-filter: blur(4px);
   z-index: 9998;
 }
@@ -127,7 +127,7 @@ h1 {
   background-color: var(--bg-secondary);
   color: var(--text-primary);
   padding: 8px 16px;
-  font-family: 'Inter', monospace;
+  font-family: 'Noto Sans', sans-serif;
   font-size: 0.875rem;
   z-index: 1;
   position: absolute;

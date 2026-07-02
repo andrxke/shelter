@@ -2,3 +2,4 @@
 backend/.env
 cron/.env
 my-app/.env
+venv/
