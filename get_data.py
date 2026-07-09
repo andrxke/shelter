@@ -5,6 +5,7 @@ import os
 from pymongo.server_api import ServerApi
 from datetime import datetime
 import pandas as pd
+import hashlib
 
 # Get .env keys
 load_dotenv('./my-app/.env')
@@ -44,7 +45,7 @@ for resource in package["result"]["resources"]:
         
         resource_data = [
             {   
-                "id": item["_id"],
+                "id": int(hashlib.md5(f"{item['ORGANIZATION_NAME']}|{item['LOCATION_NAME']}|{item['PROGRAM_NAME']}".encode()).hexdigest()[:8], 16),
                 "org_name": item["ORGANIZATION_NAME"],
                 "name": item["LOCATION_NAME"],
                 "address": item['LOCATION_ADDRESS'],
@@ -60,6 +61,8 @@ for resource in package["result"]["resources"]:
         ]
         
         data_to_insert['data'].extend(resource_data)
+        # Only use the first active resource (current year) — archived years have stale data
+        break
 
 print("length:", len(data_to_insert['data']))
 
@@ -74,7 +77,7 @@ data_df['unoccupied_beds'] =  data_df['unoccupied_beds'].fillna("")
 data_df = data_df.fillna("No Data")
 
 # Remove duplicate rows
-data_df = data_df.drop_duplicates(subset=['org_name', 'name', 'address', 'unoccupied_beds'], keep='last')
+data_df = data_df.drop_duplicates(subset=['org_name', 'name', 'address', 'program'], keep='last')
 
 # Convert to JSON form
 json_data = data_df.to_dict(orient='records')
