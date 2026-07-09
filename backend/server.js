@@ -53,7 +53,7 @@ app.get("/", (req, res) => res.send("Express on Vercel"));
 // return the most recent data entry
 app.get('/api/data', async (req,res) =>{
   try{
-    const data = await MyModel.find({}, {date: 1, data: 1}).limit(1).sort({_id:1})
+    const data = await MyModel.find({}, {date: 1, data: 1}).limit(1).sort({_id:-1})
     res.json(data)
     console.log('sent!')
   } catch(error){
